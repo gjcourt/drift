@@ -1,3 +1,5 @@
+// Package services contains the application's business logic, coordinating
+// between inbound requests and outbound repositories via the ports interfaces.
 package services
 
 import (

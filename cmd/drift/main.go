@@ -1,3 +1,4 @@
+// Package main is the entry point for the Drift portfolio simulation server.
 package main
 
 import (

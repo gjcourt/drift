@@ -1,3 +1,5 @@
+// Package ingestion parses external data formats (CSV price files and JSON
+// experiment configs) into domain objects.
 package ingestion
 
 import (

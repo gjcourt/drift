@@ -1,3 +1,5 @@
+// Package domain defines the core types and business rules for Drift.
+// It has no external dependencies and must not import from other internal packages.
 package domain
 
 import "time"

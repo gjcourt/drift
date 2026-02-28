@@ -1,3 +1,5 @@
+// Package inbound defines the service interfaces called by inbound adapters
+// (e.g. the HTTP layer). Services implement these interfaces.
 package inbound
 
 import (

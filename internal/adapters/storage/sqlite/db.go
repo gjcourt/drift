@@ -1,3 +1,5 @@
+// Package sqlite implements the outbound repository interfaces using an
+// embedded SQLite database via modernc.org/sqlite (pure-Go, no CGo required).
 package sqlite
 
 import (

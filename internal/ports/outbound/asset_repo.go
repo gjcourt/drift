@@ -1,3 +1,5 @@
+// Package outbound defines the repository interfaces used by the service layer.
+// Storage adapters (e.g. SQLite) implement these interfaces.
 package outbound
 
 import (
