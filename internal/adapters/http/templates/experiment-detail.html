@@ -1,0 +1,38 @@
+{{define "content"}}
+<h1 class="page-title">{{.Experiment.Name}}</h1>
+{{with .Experiment}}
+<div class="card config-card">
+  <dl>
+    <dt>Model</dt><dd>{{.Config.Model}}</dd>
+    <dt>Paths</dt><dd>{{.Config.NumPaths}}</dd>
+    <dt>Horizon</dt><dd>{{.Config.HorizonDays}} trading days</dd>
+    <dt>Lookback</dt><dd>{{.Config.LookbackDays}} days</dd>
+    <dt>Start Value</dt><dd>${{printf "%.2f" .Config.StartValue}}</dd>
+  </dl>
+</div>
+<form method="POST" action="/experiments/{{.ID}}/run">
+  <button type="submit" class="btn btn-primary">Run Simulation</button>
+</form>
+{{end}}
+
+{{if .Runs}}
+<h2>Run History</h2>
+<table class="table">
+  <thead><tr><th>Run ID</th><th>Status</th><th>Started</th><th>p50 Terminal</th><th>Prob. Loss</th><th></th></tr></thead>
+  <tbody>
+  {{range .Runs}}
+  <tr>
+    <td class="mono">{{.ID}}</td>
+    <td class="status-{{.Status}}">{{.Status}}</td>
+    <td>{{.StartedAt.Format "2006-01-02 15:04"}}</td>
+    <td>{{if eq (printf "%.0f" .Stats.P50) "0"}}—{{else}}${{printf "%.0f" .Stats.P50}}{{end}}</td>
+    <td>{{if eq (printf "%.1f" .Stats.ProbabilityOfLoss) "0.0"}}—{{else}}{{printf "%.1f" (mul .Stats.ProbabilityOfLoss 100.0)}}%{{end}}</td>
+    <td><a href="/runs/{{.ID}}">View</a></td>
+  </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="muted">No runs yet.</p>
+{{end}}
+{{end}}

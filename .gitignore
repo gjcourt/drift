@@ -1,0 +1,27 @@
+# Go
+/drift
+drift.db
+*.db-shm
+*.db-wal
+*.test
+*.out
+
+# Environment
+.env
+.env.*
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artefacts
+drift-linux-amd64
+drift-linux-arm64
+drift-darwin-amd64
+drift-darwin-arm64

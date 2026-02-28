@@ -1,0 +1,60 @@
+{{define "content"}}
+<h1 class="page-title">Results</h1>
+{{with .Run}}
+<p class="run-meta">
+  Run: <code>{{.ID}}</code>
+  {{if $.Experiment}} &nbsp;|&nbsp; Experiment: <strong>{{$.Experiment.Name}}</strong>{{end}}
+  &nbsp;|&nbsp; Status: <span class="status-{{.Status}}">{{.Status}}</span>
+</p>
+
+{{if eq (printf "%s" .Status) "complete"}}
+<div class="results-grid">
+  <div class="card stat-card">
+    <div class="stat-label">p95</div>
+    <div class="stat-value">${{printf "%.0f" .Stats.P95}}</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">p50 (median)</div>
+    <div class="stat-value">${{printf "%.0f" .Stats.P50}}</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">p5</div>
+    <div class="stat-value">${{printf "%.0f" .Stats.P5}}</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Prob. of Loss</div>
+    <div class="stat-value">{{printf "%.1f" (mul .Stats.ProbabilityOfLoss 100.0)}}%</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Median CAGR</div>
+    <div class="stat-value">{{printf "%.1f" (mul .Stats.MedianCAGR 100.0)}}%</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Median Max Drawdown</div>
+    <div class="stat-value">{{printf "%.1f" (mul .Stats.MedianMaxDrawdown 100.0)}}%</div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <canvas id="fanChart"></canvas>
+</div>
+
+<table class="table stats-table">
+  <thead><tr><th>Percentile</th><th>Terminal Value</th></tr></thead>
+  <tbody>
+    <tr><td>p5</td><td>${{printf "%.2f" .Stats.P5}}</td></tr>
+    <tr><td>p25</td><td>${{printf "%.2f" .Stats.P25}}</td></tr>
+    <tr><td>p50</td><td>${{printf "%.2f" .Stats.P50}}</td></tr>
+    <tr><td>p75</td><td>${{printf "%.2f" .Stats.P75}}</td></tr>
+    <tr><td>p95</td><td>${{printf "%.2f" .Stats.P95}}</td></tr>
+  </tbody>
+</table>
+
+<script>
+  window.DRIFT_STATS = {{statsJSON .Stats}};
+</script>
+{{else}}
+<p>Simulation {{.Status}}{{if .Error}}: {{.Error}}{{end}}</p>
+{{end}}
+{{end}}
+{{end}}

@@ -1,0 +1,31 @@
+{{define "content"}}
+<h1 class="page-title">Dashboard</h1>
+<div class="cards">
+  <div class="card">
+    <div class="card-value">{{len .Assets}}</div>
+    <div class="card-label">Assets Loaded</div>
+  </div>
+  <div class="card">
+    <div class="card-value">{{len .Experiments}}</div>
+    <div class="card-label">Experiments</div>
+  </div>
+</div>
+{{if .Experiments}}
+<h2>Recent Experiments</h2>
+<table class="table">
+  <thead><tr><th>Name</th><th>Model</th><th>Paths</th><th>Horizon</th><th></th></tr></thead>
+  <tbody>
+  {{range .Experiments}}
+  <tr>
+    <td>{{.Name}}</td>
+    <td>{{.Config.Model}}</td>
+    <td>{{.Config.NumPaths}}</td>
+    <td>{{.Config.HorizonDays}} days</td>
+    <td><a href="/experiments/{{.ID}}">View</a></td>
+  </tr>
+  {{end}}
+  </tbody>
+</table>
+{{end}}
+<a class="btn btn-primary" href="/experiments/new">+ New Experiment</a>
+{{end}}

@@ -1,0 +1,62 @@
+{{define "content"}}
+<h1 class="page-title">New Experiment</h1>
+<form method="POST" action="/experiments" class="exp-form">
+  <section class="form-section">
+    <h2>1. Name &amp; Description</h2>
+    <label>Name <input type="text" name="name" required placeholder="Retirement Portfolio — 10yr" /></label>
+    <label>Description <textarea name="description" rows="2" placeholder="Optional notes..."></textarea></label>
+  </section>
+
+  <section class="form-section">
+    <h2>2. Asset Allocation</h2>
+    <p class="muted">Weights must sum to 100%.</p>
+    {{if .Assets}}
+    <div id="asset-rows">
+      <div class="asset-row">
+        <select name="symbols">
+          <option value="">-- select symbol --</option>
+          {{range .Assets}}<option value="{{.Symbol}}">{{.Symbol}}</option>{{end}}
+        </select>
+        <input type="number" name="weights" min="0" max="100" step="0.1" placeholder="Weight %" value="100" />
+      </div>
+    </div>
+    <button type="button" class="btn btn-sm" onclick="addAssetRow()">+ Add Asset</button>
+    {{else}}
+    <p><a href="/data">Upload price data first</a></p>
+    {{end}}
+  </section>
+
+  <section class="form-section">
+    <h2>3. Simulation Parameters</h2>
+    <label>Model
+      <select name="model">
+        <option value="gbm">GBM (Geometric Brownian Motion)</option>
+        <option value="bootstrap">Bootstrap (Resample Returns)</option>
+        <option value="block_bootstrap">Block Bootstrap</option>
+      </select>
+    </label>
+    <label>Number of Paths <input type="range" name="num_paths" min="100" max="10000" step="100" value="1000"
+      oninput="this.nextElementSibling.textContent=this.value" /> <span>1000</span></label>
+    <label>Horizon (trading days) <input type="number" name="horizon_days" value="2520" min="1" /></label>
+    <label>Lookback Window (days) <input type="number" name="lookback_days" value="756" min="2" /></label>
+    <label>Starting Value ($) <input type="number" name="start_value" value="100000" min="1" step="1000" /></label>
+    <label>Annual Contribution ($) <input type="number" name="annual_contribution" value="0" step="100" /></label>
+  </section>
+
+  <section class="form-section">
+    <h2>4. Review &amp; Stage</h2>
+    <div class="btn-group">
+      <button type="submit" name="run_now" value="0" class="btn btn-secondary">Save as Draft</button>
+      <button type="submit" name="run_now" value="1" class="btn btn-primary">Save &amp; Run Now</button>
+    </div>
+  </section>
+</form>
+
+<script>
+function addAssetRow() {
+  const tmpl = document.querySelector('.asset-row').cloneNode(true);
+  tmpl.querySelector('input[name=weights]').value = '';
+  document.getElementById('asset-rows').appendChild(tmpl);
+}
+</script>
+{{end}}

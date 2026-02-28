@@ -1,0 +1,37 @@
+{{define "content"}}
+<h1 class="page-title">Data Manager</h1>
+
+<section class="card upload-card">
+  <h2>Upload Price Data (CSV)</h2>
+  <form method="POST" action="/data/upload"
+        hx-post="/data/upload" hx-target="#upload-result" hx-encoding="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required />
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+  <div id="upload-result"></div>
+</section>
+
+{{if .Assets}}
+<h2>Loaded Assets</h2>
+<table class="table">
+  <thead><tr><th>Symbol</th><th>Name</th><th>Actions</th></tr></thead>
+  <tbody id="assets-table">
+  {{range .Assets}}
+  <tr id="asset-row-{{.Symbol}}">
+    <td><strong>{{.Symbol}}</strong></td>
+    <td>{{.Name}}</td>
+    <td>
+      <button class="btn btn-danger btn-sm"
+        hx-delete="/data/{{.Symbol}}"
+        hx-target="#asset-row-{{.Symbol}}"
+        hx-swap="outerHTML"
+        hx-confirm="Delete all data for {{.Symbol}}?">Delete</button>
+    </td>
+  </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="muted">No assets loaded yet. Upload a CSV file to get started.</p>
+{{end}}
+{{end}}

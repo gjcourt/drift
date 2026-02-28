@@ -1,0 +1,24 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{if .Title}}{{.Title}} — {{end}}Drift</title>
+  <link rel="stylesheet" href="/static/drift.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/">Drift</a>
+    <a href="/">Dashboard</a>
+    <a href="/data">Data</a>
+    <a href="/experiments">Experiments</a>
+  </nav>
+  <main class="container">
+    {{block "content" .}}{{end}}
+  </main>
+  <script src="/static/drift.js" defer></script>
+</body>
+</html>
+{{end}}
