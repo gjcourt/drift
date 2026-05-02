@@ -1,31 +1,30 @@
-// Package services contains the application's business logic, coordinating
-// between inbound requests and outbound repositories via the ports interfaces.
-package services
+// Package app contains use-case orchestration for simulation, ingestion, and results.
+// It depends only on internal/domain and internal/ports; it must not import concrete adapter packages.
+package app
 
 import (
 	"context"
 	"io"
 
-	"github.com/gjcourt/drift/internal/adapters/ingestion"
 	"github.com/gjcourt/drift/internal/domain"
 	"github.com/gjcourt/drift/internal/ports/outbound"
 )
 
 type ingestionSvc struct {
+	csvParser outbound.CSVParser
 	assetRepo outbound.AssetRepository
 }
 
-// NewIngestionService constructs an IngestionService backed by the given asset repository.
-func NewIngestionService(ar outbound.AssetRepository) *ingestionSvc {
-	return &ingestionSvc{assetRepo: ar}
+// NewIngestionService constructs an IngestionService backed by the given parser and asset repository.
+func NewIngestionService(cp outbound.CSVParser, ar outbound.AssetRepository) *ingestionSvc {
+	return &ingestionSvc{csvParser: cp, assetRepo: ar}
 }
 
 func (s *ingestionSvc) IngestCSV(ctx context.Context, r io.Reader, filename string) (int, error) {
-	records, err := ingestion.ParseCSV(r, filename)
+	records, err := s.csvParser.ParseCSV(r, filename)
 	if err != nil {
 		return 0, err
 	}
-	// Upsert assets.
 	symbolsSeen := map[string]bool{}
 	for _, rec := range records {
 		if !symbolsSeen[rec.Symbol] {
