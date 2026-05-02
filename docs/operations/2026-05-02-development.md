@@ -1,3 +1,12 @@
+---
+title: Drift development guide
+status: Stable
+created: 2026-05-02
+updated: 2026-05-02
+updated_by: gjcourt
+tags: [operations, development]
+---
+
 # Development Guide
 
 This guide covers how to set up a local development environment, run the
