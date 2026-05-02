@@ -1,3 +1,12 @@
+---
+title: Drift simulation models
+status: Stable
+created: 2026-05-02
+updated: 2026-05-02
+updated_by: gjcourt
+tags: [reference, simulation, math]
+---
+
 # Simulation Models
 
 Drift supports two families of stochastic models for generating Monte Carlo price paths.
