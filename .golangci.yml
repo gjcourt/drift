@@ -83,10 +83,12 @@ linters:
             - pkg: "github.com/gjcourt/drift/internal/adapters"
               desc: "app must not import adapters; depend on outbound ports instead"
 
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
   max-issues-per-linter: 0
   max-same-issues: 0
