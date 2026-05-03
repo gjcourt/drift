@@ -16,27 +16,29 @@
 | `make check` | fmt + vet + lint + test |
 | `make tidy` | `go mod tidy` + verify |
 
-Single test: `go test ./internal/services -run TestSimulation -v`
+Single test: `go test ./internal/app -run TestSimulation -v`
 Pre-push: `make check`
 
 ## Architecture
 
 Hexagonal architecture (ports & adapters). Entry point: `cmd/drift/main.go`.
 
-- `internal/domain/` — entity types: assets, paths, portfolios, experiments, results.
-- `internal/ports/inbound/` — interfaces the service exposes (results, ingestion, simulation).
-- `internal/ports/outbound/` — interfaces the service requires (storage, ingestion sources).
-- `internal/services/` — application orchestration (simulation, ingestion, results).
+- `internal/domain/` — entity types: assets, paths, portfolios, experiments, results. No external deps.
+- `internal/app/` — use-case orchestration (simulation, ingestion, results); depends on `domain/` and `ports/...`.
+- `internal/ports/inbound/` — interfaces the app exposes (results, ingestion, simulation).
+- `internal/ports/outbound/` — interfaces the app requires (storage, CSV parsing).
 - `internal/adapters/http/` — driving adapter (HTTP server + handlers + templates).
-- `internal/adapters/ingestion/` — CSV / JSON ingestion.
-- `internal/adapters/storage/sqlite/` — SQLite persistence.
+- `internal/adapters/ingestion/` — CSV / JSON ingestion; implements `outbound.CSVParser`.
+- `internal/adapters/storage/sqlite/` — SQLite persistence; implements all repository ports.
 - `web/` — HTML templates and frontend assets.
 
 See `docs/architecture/` for the full guide.
 
 ## Conventions
 
-- **Simulation logic lives in `services/` and `domain/`** — never in HTTP handlers.
+- **Simulation logic lives in `app/` and `domain/`** — never in HTTP handlers.
+- **`internal/app/` depends only on `domain/` and `ports/...`** — never on adapters.
+- **Adapters implement ports** — adapters translate between external formats and domain types.
 - **No ORM** — SQLite is accessed via stdlib `database/sql` only.
 - **Templates** are resolved from source tree in dev (`DRIFT_TMPL_DIR` set) and embedded in the binary for production.
 - **Conventional Commits** for every commit (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `ci:`).
@@ -46,15 +48,15 @@ See `docs/architecture/` for the full guide.
 ## Invariants
 
 - `internal/domain/` must not import any third-party packages outside stdlib.
-- `internal/ports/` must not import `internal/adapters/` or `internal/services/`.
-- `internal/services/` must not import `internal/adapters/`.
+- `internal/ports/` must not import `internal/adapters/` or `internal/app/`.
+- `internal/app/` must not import `internal/adapters/`.
 - `internal/adapters/http/handlers/` translates request → port → response only — no simulation logic.
 - The local SQLite file `drift.db` is gitignored and never committed.
 
 ## What NOT to Do
 
-- Do not put SQL or HTTP types in `internal/services/` or `internal/domain/` — adapters translate, core stays pure.
-- Do not import `internal/adapters/` from `internal/ports/` or `internal/services/`.
+- Do not put SQL or HTTP types in `internal/app/` or `internal/domain/` — adapters translate, core stays pure.
+- Do not import `internal/adapters/` from `internal/ports/` or `internal/app/`.
 - Do not skip `make check` before committing — formatting / vet / lint / test must all be green.
 - Do not commit `drift.db` or any uploaded CSV under `data/`.
 

@@ -48,8 +48,8 @@ linters:
           deny:
             - pkg: "github.com/gjcourt/drift/internal/ports"
               desc: "domain must not import ports"
-            - pkg: "github.com/gjcourt/drift/internal/services"
-              desc: "domain must not import services"
+            - pkg: "github.com/gjcourt/drift/internal/app"
+              desc: "domain must not import app"
             - pkg: "github.com/gjcourt/drift/internal/adapters"
               desc: "domain must not import adapters"
 
@@ -58,32 +58,37 @@ linters:
           files:
             - "**/internal/ports/**/*.go"
           deny:
-            - pkg: "github.com/gjcourt/drift/internal/services"
-              desc: "ports must not import services"
+            - pkg: "github.com/gjcourt/drift/internal/app"
+              desc: "ports must not import app"
             - pkg: "github.com/gjcourt/drift/internal/adapters"
               desc: "ports must not import adapters"
 
-        # adapters must not import the services/app layer or sibling adapters.
+        # adapters must not import the app layer or sibling adapters.
         adapters-isolation:
           files:
             - "**/internal/adapters/**/*.go"
           deny:
-            - pkg: "github.com/gjcourt/drift/internal/services"
-              desc: "adapters must not import the services layer"
+            - pkg: "github.com/gjcourt/drift/internal/app"
+              desc: "adapters must not import the app layer"
             - pkg: "github.com/gjcourt/drift/internal/adapters/ingestion"
               desc: "adapters must not import sibling adapters"
             - pkg: "github.com/gjcourt/drift/internal/adapters/storage"
               desc: "adapters must not import sibling adapters"
 
-        # Pending: services-no-adapters rule is blocked by
-        # internal/services/ingestion.go importing internal/adapters/ingestion
-        # directly. Add after refactoring to use the outbound.AssetRepository
-        # port interface.
+        # app layer must not import concrete adapters — only ports.
+        app-no-adapters:
+          files:
+            - "**/internal/app/**/*.go"
+          deny:
+            - pkg: "github.com/gjcourt/drift/internal/adapters"
+              desc: "app must not import adapters; depend on outbound ports instead"
+
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
 
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
   max-issues-per-linter: 0
   max-same-issues: 0

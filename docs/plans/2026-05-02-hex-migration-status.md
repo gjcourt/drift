@@ -15,13 +15,13 @@ tags: ["architecture", "hex", "tracking"]
 |---|---|---|
 | `domain-no-other-internal` | Active ✓ | Domain has no internal imports |
 | `ports-no-impl` | Active ✓ | Ports only import domain |
-| `adapters-isolation` | Active ✓ | Adapters don't cross-import or call services |
-| `services-no-adapters` | Pending ✗ | `services/ingestion.go` imports `adapters/ingestion` — fix in step 1 |
+| `adapters-isolation` | Active ✓ | Adapters don't cross-import or call app |
+| `app-no-adapters` | Active ✓ | `app/ingestion.go` refactored to use `outbound.CSVParser` port |
 
 ## Migration checklist
 
-- [ ] Step 1 — refactor `services/ingestion.go` to use `outbound.AssetRepository` port
-- [ ] Step 2 — activate `services-no-adapters` depguard rule
-- [ ] Step 3 — rename `services/` → `app/`
+- [x] Step 1 — refactor `services/ingestion.go` to use `outbound.CSVParser` port (wired via `ingestion.Parser{}` in `main.go`)
+- [x] Step 2 — activate `app-no-adapters` depguard rule
+- [x] Step 3 — rename `services/` → `app/`
 - [ ] Step 4 — add fakes to `testdoubles/`, wire `ServerDeps`
 - [ ] Step 5 — migrate app-layer tests to use `testdoubles.NewServerDeps()`
