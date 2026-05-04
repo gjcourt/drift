@@ -29,8 +29,12 @@ func (s *simulationSvc) RunExperiment(ctx context.Context, experimentID string) 
 	if err != nil {
 		return nil, fmt.Errorf("get experiment: %w", err)
 	}
+	runID, err := newID("run")
+	if err != nil {
+		return nil, fmt.Errorf("generate run id: %w", err)
+	}
 	run := domain.Run{
-		ID:           newID("run"),
+		ID:           runID,
 		ExperimentID: experimentID,
 		StartedAt:    time.Now().UTC(),
 		Status:       domain.StatusRunning,

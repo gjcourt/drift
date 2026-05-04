@@ -20,7 +20,11 @@ func NewResultsService(er outbound.ExperimentRepository, sr outbound.SimulationR
 
 func (s *resultsSvc) CreateExperiment(ctx context.Context, exp domain.Experiment) (*domain.Experiment, error) {
 	if exp.ID == "" {
-		exp.ID = newID("exp")
+		id, err := newID("exp")
+		if err != nil {
+			return nil, err
+		}
+		exp.ID = id
 	}
 	exp.CreatedAt = time.Now().UTC()
 	exp.UpdatedAt = exp.CreatedAt

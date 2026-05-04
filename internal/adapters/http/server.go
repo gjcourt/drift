@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
@@ -54,7 +55,11 @@ func New(
 
 	r.Get("/runs/{id}", h.RunResults)
 
-	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
+	// Serve /static/ from a rooted fs.FS so requests cannot escape staticDir
+	// via traversal (e.g. ..%2F encodings); http.Dir alone permits any
+	// well-formed path under the host directory and offers no defence in
+	// depth if staticDir is misconfigured to a directory containing secrets.
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(os.DirFS(staticDir)))))
 
 	return r
 }
