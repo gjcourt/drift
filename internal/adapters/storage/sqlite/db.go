@@ -122,14 +122,20 @@ func (s *Store) ListAssets(ctx context.Context) ([]domain.Asset, error) {
 	return assets, rows.Err()
 }
 
-// DeleteAsset removes an asset and all its associated price records.
+// DeleteAsset removes an asset and all its associated price records atomically.
 func (s *Store) DeleteAsset(ctx context.Context, symbol string) error {
-	_, err := s.db.ExecContext(ctx, `DELETE FROM assets WHERE symbol=?`, symbol)
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("begin tx: %w", err)
 	}
-	_, err = s.db.ExecContext(ctx, `DELETE FROM price_records WHERE symbol=?`, symbol)
-	return err
+	defer tx.Rollback() //nolint:errcheck // Rollback is a no-op after Commit; error is intentionally ignored
+	if _, err := tx.ExecContext(ctx, `DELETE FROM assets WHERE symbol=?`, symbol); err != nil {
+		return fmt.Errorf("delete asset: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM price_records WHERE symbol=?`, symbol); err != nil {
+		return fmt.Errorf("delete price records: %w", err)
+	}
+	return tx.Commit()
 }
 
 // UpsertPriceRecords bulk-upserts price records, replacing rows with matching (symbol, date).
@@ -229,14 +235,20 @@ func (s *Store) ListExperiments(ctx context.Context) ([]domain.Experiment, error
 	return exps, rows.Err()
 }
 
-// DeleteExperiment removes an experiment and all its associated runs.
+// DeleteExperiment removes an experiment and all its associated runs atomically.
 func (s *Store) DeleteExperiment(ctx context.Context, id string) error {
-	_, err := s.db.ExecContext(ctx, `DELETE FROM experiments WHERE id=?`, id)
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("begin tx: %w", err)
 	}
-	_, err = s.db.ExecContext(ctx, `DELETE FROM runs WHERE experiment_id=?`, id)
-	return err
+	defer tx.Rollback() //nolint:errcheck // Rollback is a no-op after Commit; error is intentionally ignored
+	if _, err := tx.ExecContext(ctx, `DELETE FROM experiments WHERE id=?`, id); err != nil {
+		return fmt.Errorf("delete experiment: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM runs WHERE experiment_id=?`, id); err != nil {
+		return fmt.Errorf("delete runs: %w", err)
+	}
+	return tx.Commit()
 }
 
 type scanner interface {

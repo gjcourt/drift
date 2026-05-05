@@ -1,41 +1,24 @@
-## Summary
+## What changed
+<!-- Concise bullet list of changes made -->
 
-<!-- What does this PR do? Why? Link any related issues. -->
-
-Fixes #
-
----
+## Why
+<!-- What problem does this solve? Link any related issues (Fixes #N) -->
 
 ## Type of change
-
 - [ ] `feat` — new feature
 - [ ] `fix` — bug fix
 - [ ] `refactor` — no behaviour change
-- [ ] `test` — tests only
 - [ ] `docs` — documentation only
+- [ ] `test` — tests only
 - [ ] `ci` — CI / build system
 - [ ] `chore` — housekeeping
 
----
-
 ## Checklist
-
-- [ ] `make check` passes locally (fmt + vet + lint + test)
-- [ ] Tests added / updated for all changed behaviour
-- [ ] All new exported symbols have Go doc comments
-- [ ] No bare `//nolint` — every suppression names the linter and explains why
-- [ ] `go.mod` / `go.sum` are tidy (`go mod tidy`)
 - [ ] Branch name follows `<type>/<description>` convention
-- [ ] PR title follows Conventional Commits format
+- [ ] PR title follows Conventional Commits format (`type: description`)
+- [ ] Tests added / updated for changed behaviour
+- [ ] Documentation updated (if applicable)
+- [ ] No unrelated changes in this PR
 
----
-
-## Testing
-
-<!-- How was this tested? Which test cases cover the change? -->
-
----
-
-## Screenshots (if UI change)
-
-<!-- Before / after or N/A -->
+## Notes
+<!-- Screenshots, deployment steps, or anything else reviewers need to know -->

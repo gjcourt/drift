@@ -9,8 +9,9 @@ import (
 	"runtime"
 
 	httpAdapter "github.com/gjcourt/drift/internal/adapters/http"
+	"github.com/gjcourt/drift/internal/adapters/ingestion"
 	"github.com/gjcourt/drift/internal/adapters/storage/sqlite"
-	"github.com/gjcourt/drift/internal/services"
+	"github.com/gjcourt/drift/internal/app"
 )
 
 func main() {
@@ -35,9 +36,9 @@ func main() {
 	}
 
 	// Wire services.
-	ingestionSvc := services.NewIngestionService(store)
-	resultsSvc := services.NewResultsService(store, store)
-	simSvc := services.NewSimulationService(store, store, store)
+	ingestionSvc := app.NewIngestionService(ingestion.Parser{}, store)
+	resultsSvc := app.NewResultsService(store, store)
+	simSvc := app.NewSimulationService(store, store, store)
 
 	// Build HTTP handler.
 	handler := httpAdapter.New(ingestionSvc, resultsSvc, simSvc, tmplDir, staticDir)

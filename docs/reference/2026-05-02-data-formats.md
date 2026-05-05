@@ -1,3 +1,12 @@
+---
+title: Drift data formats
+status: Stable
+created: 2026-05-02
+updated: 2026-05-02
+updated_by: gjcourt
+tags: [reference, csv, data]
+---
+
 # Data Formats
 
 This document describes the file formats that Drift accepts for price data and

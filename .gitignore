@@ -25,3 +25,6 @@ drift-linux-amd64
 drift-linux-arm64
 drift-darwin-amd64
 drift-darwin-arm64
+
+# Worktrees
+.worktrees/
