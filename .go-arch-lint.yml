@@ -1,0 +1,110 @@
+version: 3
+
+# Hexagonal (ports & adapters) boundary guard for Drift.
+#
+# The dependency rule is INWARD ONLY:
+#   adapters -> app -> domain
+#   ports (interfaces owned by the core) -> domain
+#   cmd/drift (composition root) -> everything
+#
+# domain depends on nothing internal. ports depend only on domain.
+# Adapters depend on domain + ports, never on app or each other.
+# Only cmd/drift may import concrete adapters (it wires them together).
+#
+# Every .go file must map to exactly one component below or the linter errors.
+# Run locally: go-arch-lint check
+
+allow:
+  # Third-party/vendor imports are governed by go.mod, not by this guard.
+  depOnAnyVendor: true
+  # Enforce the inward rule on ACTUAL package imports. With deepScan on,
+  # go-arch-lint traces value flow across call sites; at the composition root
+  # (cmd/drift/main.go) that misreads wiring as dependencies (e.g. a *sqlite.Store
+  # passed into app.NewSimulationService gets flagged as storage -> app). Import
+  # granularity is the correct level for hexagonal boundaries here.
+  deepScan: false
+
+components:
+  domain:
+    in: internal/domain
+  ports-inbound:
+    in: internal/ports/inbound
+  ports-outbound:
+    in: internal/ports/outbound
+  app:
+    in: internal/app
+  adapter-http:
+    in: internal/adapters/http
+  adapter-http-handlers:
+    in: internal/adapters/http/handlers
+  adapter-ingestion:
+    in: internal/adapters/ingestion
+  adapter-storage-sqlite:
+    in: internal/adapters/storage/sqlite
+  testdoubles:
+    in: internal/testdoubles
+  cmd:
+    in: cmd/drift
+
+deps:
+  # Core: pure business types, no internal dependencies at all.
+  # (domain is intentionally absent — it may depend on nothing internal.)
+
+  # Ports are interfaces owned by the core; they reference only domain types.
+  ports-inbound:
+    mayDependOn:
+      - domain
+  ports-outbound:
+    mayDependOn:
+      - domain
+
+  # Application/use-case layer: orchestrates domain via ports.
+  # Actual imports today: domain + ports-outbound. ports-inbound is allowed
+  # because app implements those inbound interfaces (structural typing, no
+  # import required today, but permitted by the "app may depend on ports" rule).
+  app:
+    mayDependOn:
+      - domain
+      - ports-inbound
+      - ports-outbound
+
+  # Inbound (driving) adapters: translate HTTP <-> ports. Never touch app or storage.
+  adapter-http:
+    mayDependOn:
+      - domain
+      - ports-inbound
+      - adapter-http-handlers
+  adapter-http-handlers:
+    mayDependOn:
+      - domain
+      - ports-inbound
+
+  # Outbound (driven) adapters: implement outbound ports. Never import app.
+  adapter-ingestion:
+    mayDependOn:
+      - domain
+      - ports-outbound
+  adapter-storage-sqlite:
+    mayDependOn:
+      - domain
+      - ports-outbound
+
+  # Test doubles for outbound/inbound ports used by unit tests.
+  testdoubles:
+    mayDependOn:
+      - domain
+      - ports-inbound
+      - ports-outbound
+
+  # Composition root: wires concrete adapters into the app. May import anything.
+  cmd:
+    mayDependOn:
+      - domain
+      - ports-inbound
+      - ports-outbound
+      - app
+      - adapter-http
+      - adapter-http-handlers
+      - adapter-ingestion
+      - adapter-storage-sqlite
+      - testdoubles

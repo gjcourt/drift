@@ -101,6 +101,25 @@ jobs:
           version: v2.12.1
           args: --timeout=5m
 
+  # ── Arch guard ─────────────────────────────────────────────────────────────
+  arch-lint:
+    name: Architecture guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install go-arch-lint
+        run: go install github.com/fe3dback/go-arch-lint@v1.16.0
+
+      - name: Check hexagonal boundaries
+        run: go-arch-lint check
+
   # ── Tidy ───────────────────────────────────────────────────────────────────
   tidy:
     name: Module tidy

@@ -32,7 +32,7 @@ Hexagonal architecture (ports & adapters). Entry point: `cmd/drift/main.go`.
 - `internal/adapters/storage/sqlite/` — SQLite persistence; implements all repository ports.
 - `web/` — HTML templates and frontend assets.
 
-See `docs/architecture/` for the full guide.
+See [`docs/architecture.md`](docs/architecture.md) for the full, code-accurate architecture reference (diagram, request flows, ports & adapters map, deployment). The dated overview note lives under `docs/architecture/`. Boundaries are enforced by go-arch-lint via `.go-arch-lint.yml` and the `arch-lint` CI job.
 
 ## Conventions
 
