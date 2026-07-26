@@ -43,6 +43,7 @@ See `docs/architecture/` for the full guide.
 - **Templates** are resolved from source tree in dev (`DRIFT_TMPL_DIR` set) and embedded in the binary for production.
 - **Conventional Commits** for every commit (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `ci:`).
 - **Branch names** follow `<type>/<description>`.
+- **All changes go through a branch and pull request** — never commit directly to the default branch (`main`); it is protected.
 - **Every exported symbol** has a Go doc comment. No bare `//nolint` — every suppression names the linter and explains why.
 
 ## Invariants
