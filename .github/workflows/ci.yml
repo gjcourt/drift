@@ -115,7 +115,7 @@ jobs:
           cache: true
 
       - name: Install go-arch-lint
-        run: go install github.com/fe3dback/go-arch-lint@v1.16.0
+        run: go install github.com/fe3dback/go-arch-lint@v1.18.0
 
       - name: Check hexagonal boundaries
         run: go-arch-lint check
