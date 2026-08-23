@@ -222,7 +222,7 @@ Verified against `go.mod`:
 ## 7. Boundary guard (go-arch-lint)
 
 The hexagonal boundaries are enforced in CI by
-[`fe3dback/go-arch-lint`](https://github.com/fe3dback/go-arch-lint) **v1.16.0**, configured in
+[`fe3dback/go-arch-lint`](https://github.com/fe3dback/go-arch-lint) **v1.18.0**, configured in
 [`.go-arch-lint.yml`](../.go-arch-lint.yml) (`version: 3`). Components mirror the package
 layout above; `deps` encode the inward rule: `domain` may depend on nothing, ports on
 `domain`, `app` on `domain` + ports, adapters on `domain` + ports (never `app`, never each
@@ -239,7 +239,7 @@ Run locally:
 
 ```bash
 export PATH="$PATH:$(go env GOPATH)/bin"
-go install github.com/fe3dback/go-arch-lint@v1.16.0
+go install github.com/fe3dback/go-arch-lint@v1.18.0
 go-arch-lint check   # exits 0, "OK - No warnings found"
 ```
 
@@ -284,5 +284,5 @@ file `drift.db` (plus `-wal`/`-shm`) is the entire persistent state and is gitig
 
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on pushes and PRs to `main`:
 `build`, `test` (race detector), `format` (gofmt), `vet`, `lint` (golangci-lint), `tidy`
-(`go mod tidy` drift check), and **`arch-lint`** — installs `go-arch-lint@v1.16.0` and runs
+(`go mod tidy` drift check), and **`arch-lint`** — installs `go-arch-lint@v1.18.0` and runs
 `go-arch-lint check` to keep the hexagonal boundaries green on every PR.
