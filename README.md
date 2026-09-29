@@ -23,11 +23,12 @@ make build
 
 ## Environment Variables
 
-| Variable        | Default      | Description                       |
-|-----------------|--------------|-----------------------------------|
-| `DRIFT_ADDR`    | `:8080`      | HTTP listen address               |
-| `DRIFT_DB`      | `drift.db`   | SQLite database file path         |
-| `DRIFT_TMPL_DIR`| (auto)       | Path to HTML template directory   |
+| Variable          | Default      | Description                       |
+|-------------------|--------------|-----------------------------------|
+| `DRIFT_ADDR`      | `:8080`      | HTTP listen address               |
+| `DRIFT_DB`        | `drift.db`   | SQLite database file path         |
+| `DRIFT_TMPL_DIR`  | (auto)       | Path to HTML template directory   |
+| `DRIFT_STATIC_DIR`| (auto)       | Path to static assets (`web/static`) served at `/static/*` |
 
 ## Usage
 
@@ -55,16 +56,19 @@ date,symbol,open,high,low,close,volume,adjusted_close
 
 ## Architecture
 
-Hexagonal (Ports & Adapters):
+Hexagonal (ports & adapters), enforced by go-arch-lint:
 
 ```
-HTTP Adapter → Domain Services → SQLite / File Adapters
+adapters (http, ingestion, storage)  →  app  →  domain
 ```
 
-- **Domain**: pure Go types in `internal/domain/`
-- **Services**: GBM engine, CSV ingestion, results aggregation in `internal/services/`
+- **Domain**: pure Go types in `internal/domain/` (assets, portfolios, experiments, results) — no external deps
+- **App**: use-case orchestration (GBM engine, bootstrap resampling, CSV ingestion, results aggregation) in `internal/app/`, depending only on `domain` and `internal/ports/`
+- **Ports**: interfaces the app exposes and requires, in `internal/ports/inbound/` and `internal/ports/outbound/`
 - **HTTP adapter**: Chi router + Go `html/template` + HTMX in `internal/adapters/http/`
-- **Storage adapter**: SQLite via `modernc.org/sqlite` in `internal/adapters/storage/sqlite/`
+- **Storage adapter**: SQLite via `modernc.org/sqlite` (no CGo, no ORM) in `internal/adapters/storage/sqlite/`
+
+See [`docs/architecture.md`](docs/architecture.md) for the full reference, including a component diagram.
 
 ## Simulation Models
 
@@ -73,7 +77,3 @@ HTTP Adapter → Domain Services → SQLite / File Adapters
 | `gbm`             | Geometric Brownian Motion using historical μ and σ      |
 | `bootstrap`       | Resample historical daily log-returns with replacement  |
 | `block_bootstrap` | Same as bootstrap (block variant planned)               |
-
-## License
-
-MIT
