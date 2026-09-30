@@ -13,7 +13,7 @@ external services.
 
 **Status:** experimental — the simulation engine and web UI are feature-complete and
 covered by CI, but there has been no feature work since 2026-07 (only dependency
-updates since), and it isn't deployed anywhere yet.
+updates since), and it isn't deployed on the homelab.
 
 ## Quick start
 
@@ -46,8 +46,8 @@ View a run's results page for the percentile chart and summary statistics
 |---|---|---|
 | `DRIFT_ADDR` | `:8080` | HTTP listen address |
 | `DRIFT_DB` | `drift.db` | SQLite database file path |
-| `DRIFT_TMPL_DIR` | (auto) | HTML template directory; auto-resolved from the source tree in dev |
-| `DRIFT_STATIC_DIR` | (auto) | Static-asset directory for `/static/*` |
+| `DRIFT_TMPL_DIR` | `internal/adapters/http/templates` in the source tree the binary was built from | HTML template directory |
+| `DRIFT_STATIC_DIR` | `web/static` in the source tree the binary was built from | Static-asset directory for `/static/*` |
 
 ## How it works
 
@@ -59,23 +59,27 @@ experiments, and runs. Full reference: [docs/architecture.md](docs/architecture.
 ## Development
 
 ```bash
-make fmt
-make vet
-make lint
-make test
+make check          # go fmt + go vet + golangci-lint + go test -race
+go-arch-lint check  # hexagonal boundaries
+go mod tidy         # CI fails if this changes go.mod or go.sum
 ```
 
-Or `make check` to run them all — this is what CI runs on every push and PR.
+CI runs on every push to `main` and every PR: `go build ./...`, `gofmt -l .`
+(fails on any unformatted file rather than rewriting it), `go vet ./...`,
+golangci-lint, `go test -race -count=1 -timeout 120s ./...`,
+`go-arch-lint check`, and the `go mod tidy` diff check.
 Conventions for contributors and agents: [AGENTS.md](AGENTS.md).
 
 ## Deployment
 
-Drift ships as standalone binaries (linux/darwin, amd64/arm64) built by
-[`release.yml`](.github/workflows/release.yml) on tagged releases — there is no
-Dockerfile and no homelab deployment today. Self-host by running a binary with
-`DRIFT_ADDR` and `DRIFT_DB` set (and `DRIFT_TMPL_DIR` / `DRIFT_STATIC_DIR` if the
-templates and static assets aren't co-located with it).
+Pushing a `v*` tag runs [`release.yml`](.github/workflows/release.yml), which
+builds standalone binaries (linux/darwin, amd64/arm64) and attaches them to a
+GitHub release; no release has been tagged yet. There is no Dockerfile and no
+homelab deployment. Templates and static assets are read from disk, not
+embedded, so a binary run outside its source tree needs `DRIFT_TMPL_DIR` and
+`DRIFT_STATIC_DIR` pointed at copies of `internal/adapters/http/templates` and
+`web/static`, plus `DRIFT_ADDR` and `DRIFT_DB`.
 
 ## License
 
-No licence file yet.
+[Apache-2.0](LICENSE).
