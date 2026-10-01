@@ -82,4 +82,4 @@ embedded, so a binary run outside its source tree needs `DRIFT_TMPL_DIR` and
 
 ## License
 
-[Apache-2.0](LICENSE).
+[Apache-2.0](LICENSE)
